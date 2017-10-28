@@ -22,6 +22,16 @@ def index():
                             colors=colors
     )
 
+@app.route('/remote')
+def remote():
+    return render_template('remote.html', colors=colors)
+
+@sio.on('colors', namespace='/flask')
+def change_colors(msg):
+    global colors
+
+    colors[msg['color']] = msg['value']
+    sio.emit('square', colors, namespace='/flask')
 
 if __name__ == '__main__':
     sio.run(app, debug=True)

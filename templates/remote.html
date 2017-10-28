@@ -8,21 +8,23 @@
     <script type="text/javascript" charset="UTF-8">
         $(document).ready(function () {
             namespace = '/flask';
+
             var sio = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-            $(".square").css("background-color", "rgb({{ colors.values()|join(', ') }})");
 
-            sio.on('square', function (msg) {
-                $(".square").css("background-color", "rgb(" + msg.red + ", " + msg.green + "," + msg.blue + ")");
+            $("input.sync").on('input', function () {
+                sio.emit('colors', {'color': $(this).attr('id'), 'value': $(this).val()});
+                return false;
             });
-
-        });
+        })
     </script>
-    <title>{{ title }}</title>
+    <title>Remote</title>
 </head>
 <body>
-    <h1>{{ text }}</h1>
-    <div class="square">
-        Ancle, ancle, ancle
-    </div>
+{% for k, v in colors.items() %}
+    <input id="{{ k }}" class="sync" type="range" min="0" max="255" value="{{ v }}">
+    {% if not loop.last %}
+        <br />
+    {% endif %}
+{% endfor %}
 </body>
 </html>
